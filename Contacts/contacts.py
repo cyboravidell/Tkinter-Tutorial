@@ -5,11 +5,19 @@ from tkinter import ttk    # Provides access to the Tk themed widgets.
 class Contacts:
     def __init__(self,root):
         self.root = root
+        self.create_gui()
+        ttk.style = ttk.Style()
+        ttk.style.configure("Treeview", font=('helvetica', 10))
+        ttk.style.configure("Treeview.Heading", font=('helvetica', 12,'bold'))
+        
+    def create_gui(self):
         self.create_left_icon()
         self.create_label_frame()
         self.create_message_area()
         self.create_tree_view()
-        ttk.Style = ttk.Style
+        self.create_scrollbar()
+        self.create_bottom_buttons()
+
     def create_left_icon(self):
         photo = PhotoImage(file='E:\Tkinter Tutorial\Contacts\icons\logo.png')
         label = Label(image=photo)
@@ -40,6 +48,14 @@ class Contacts:
         self.tree.heading("#0",text='Name',anchor=W)
         self.tree.heading("email",text='Email Address',anchor=W)
         self.tree.heading("number",text='Contact Number',anchor=W)
+
+    def create_scrollbar(self):
+        self.scrollbar = Scrollbar(orient='vertical',command=self.tree.yview)
+        self.scrollbar.grid(row=6,column=3,rowspan=10,sticky='sn')
+
+    def create_bottom_buttons(self):
+        Button(text='Delete Selected', command='',bg='red',fg="white").grid(row=8,column=0, sticky=W,padx=20,pady=10)
+        Button(text="Modify Selected", command="", bg="purple", fg="white").grid(row=8,column=1,sticky=W)
 
 if __name__ == '__main__':
     root  = Tk()
