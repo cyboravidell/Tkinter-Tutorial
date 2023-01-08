@@ -13,6 +13,7 @@ class Contacts:
         ttk.style = ttk.Style()
         ttk.style.configure("Treeview", font=('helvetica', 10))
         ttk.style.configure("Treeview.Heading", font=('helvetica', 12,'bold'))
+
     def execute_db_query(self,query,parameter=()):
         with sqlite3.connect(self.db_filename)as conn:
             print(conn)
@@ -29,6 +30,7 @@ class Contacts:
         self.create_tree_view()
         self.create_scrollbar()
         self.create_bottom_buttons()
+        self.view_contacts()
 
     def create_left_icon(self):
         photo = PhotoImage(file='E:\Tkinter Tutorial\Contacts\icons\logo.png')
@@ -48,7 +50,7 @@ class Contacts:
         Label(labelFrame, text='Number: ', bg="black",fg="white").grid(row=3, column=1, sticky=W, padx=15, pady=2)
         self.numfield = Entry(labelFrame)
         self.numfield.grid(row=3,column=2, sticky=W, padx=5,pady=2)
-        Button(labelFrame, text='Add Contact', command="", bg="blue",fg="white").grid(row=4, column=2, sticky=E, padx=5,pady=5)
+        Button(labelFrame, text='Add Contact', command=self.on_add_contact_button_clicked, bg="blue",fg="white").grid(row=4, column=2, sticky=E, padx=5,pady=5)
  
     def create_message_area(self):
         self.message = Label(text='', fg="red")
@@ -57,7 +59,7 @@ class Contacts:
     def create_tree_view(self):
         self.tree = ttk.Treeview(height=10, columns=("email","number"),style='Treeview')
         self.tree.grid(row=6,column=0,columnspan=3)
-        self.tree.heading("#0",text='Name',anchor=W)
+        self.tree.heading("#0",text=' Name',anchor=W)
         self.tree.heading("email",text='Email Address',anchor=W)
         self.tree.heading("number",text='Contact Number',anchor=W)
 
@@ -69,7 +71,36 @@ class Contacts:
         Button(text='Delete Selected', command='',bg='red',fg="white").grid(row=8,column=0, sticky=W,padx=20,pady=10)
         Button(text="Modify Selected", command="", bg="purple", fg="white").grid(row=8,column=1,sticky=W)
 
-    
+    def on_add_contact_button_clicked(self):
+        self.add_new_contact()
+
+    def add_new_contact(self):
+        if self.new_contacts_validated():
+            query = 'INSERT INTO contact_list VALUES(NULL,?, ?,?)'
+            parameters = (self.namefield.get(),self.emailfield.get(), self.numfield.get())
+            self.execute_db_query(query, parameters)
+            self.message['text'] = 'New Contact {} added'.format(self.namefield.get())
+            self.namefield.delete(0, END)
+            self.emailfield.delete(0, END)
+            self.numfield.delete(0, END)
+            self.view_contacts()
+
+        else:
+            self.message['text'] = 'name,email and number cannot be blank'
+        self.view_contacts()
+
+    def new_contacts_validated(self):
+        return len(self.namefield.get()) != 0 and len(self.emailfield.get()) != 0 and len(self.numfield.get()) != 0
+
+    def view_contacts(self):
+        items = self.tree.get_children()
+        for item in items:
+            self.tree.delete(item)
+        query = 'SELECT * FROM contact_list order by name desc'
+        contact_entries = self.execute_db_query(query)
+        for row in contact_entries:
+            self.tree.insert('',0, text=row[1], values=(row[2],row[3]))
+
 if __name__ == '__main__':
     root  = Tk()
     root.title('My Contacts List')
