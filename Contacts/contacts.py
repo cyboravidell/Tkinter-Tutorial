@@ -74,6 +74,15 @@ class Contacts:
     def on_add_contact_button_clicked(self):
         self.add_new_contact()
 
+    def on_delete_selected_button_clicked(self):
+        self.message['text'] = ''
+        try:
+            self.tree.item(self.tree.selection())['values'][0]
+        except IndexError as e:
+            self.message['text'] = 'No item selected to delete'
+            return
+        self.delete_contacts()
+
     def add_new_contact(self):
         if self.new_contacts_validated():
             query = 'INSERT INTO contact_list VALUES(NULL,?, ?,?)'
@@ -100,6 +109,14 @@ class Contacts:
         contact_entries = self.execute_db_query(query)
         for row in contact_entries:
             self.tree.insert('',0, text=row[1], values=(row[2],row[3]))
+
+    def delete_contacts(self):
+        self.message['text'] = ''
+        name = self.tree.item(self.tree.selection())['text']
+        query = 'DELETE FROM contact_list where name = ?'
+        self.execute_db_query(query,(name,))
+        self.message['text'] = f'Contacts for {name} deleted'
+        self.view_contacts()
 
 if __name__ == '__main__':
     root  = Tk()
