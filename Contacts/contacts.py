@@ -1,15 +1,27 @@
 # import what you need from tkinter module
 from tkinter import Tk, Button, PhotoImage, Label, LabelFrame, W, E, N, S, Entry, END, StringVar, Scrollbar, Toplevel
 from tkinter import ttk    # Provides access to the Tk themed widgets.
+import sqlite3
+
+
 
 class Contacts:
+    db_filename = 'contacts.db'
     def __init__(self,root):
         self.root = root
         self.create_gui()
         ttk.style = ttk.Style()
         ttk.style.configure("Treeview", font=('helvetica', 10))
         ttk.style.configure("Treeview.Heading", font=('helvetica', 12,'bold'))
-        
+    def execute_db_query(self,query,parameter=()):
+        with sqlite3.connect(self.db_filename)as conn:
+            print(conn)
+            print(' You have successfuly connected to the Database')
+            cursor = conn.cursor()
+            query_result = cursor.execute(query, parameter)
+            conn.commit()
+        return query_result
+
     def create_gui(self):
         self.create_left_icon()
         self.create_label_frame()
@@ -57,6 +69,7 @@ class Contacts:
         Button(text='Delete Selected', command='',bg='red',fg="white").grid(row=8,column=0, sticky=W,padx=20,pady=10)
         Button(text="Modify Selected", command="", bg="purple", fg="white").grid(row=8,column=1,sticky=W)
 
+    
 if __name__ == '__main__':
     root  = Tk()
     root.title('My Contacts List')
