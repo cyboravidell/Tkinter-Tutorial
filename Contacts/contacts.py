@@ -68,7 +68,7 @@ class Contacts:
         self.scrollbar.grid(row=6,column=3,rowspan=10,sticky='sn')
 
     def create_bottom_buttons(self):
-        Button(text='Delete Selected', command='',bg='red',fg="white").grid(row=8,column=0, sticky=W,padx=20,pady=10)
+        Button(text='Delete Selected', command=self.on_delete_selected_button_clicked,bg='red',fg="white").grid(row=8,column=0, sticky=W,padx=20,pady=10)
         Button(text="Modify Selected", command="", bg="purple", fg="white").grid(row=8,column=1,sticky=W)
 
     def on_add_contact_button_clicked(self):
